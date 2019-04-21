@@ -197,6 +197,7 @@ namespace AsyncTest
         /// </summary>
         public void Fun4()
         {
+            
             //设置 BackgroundWorker 属性
             _Worker.WorkerReportsProgress = true;   //能否报告进度更新
             _Worker.WorkerSupportsCancellation = true;  //是否支持异步取消
@@ -205,6 +206,10 @@ namespace AsyncTest
             _Worker.DoWork += _Worker_DoWork;   //开始执行后台操作时触发，即调用 BackgroundWorker.RunWorkerAsync 时触发
             _Worker.ProgressChanged += _Worker_ProgressChanged; //调用 BackgroundWorker.ReportProgress(System.Int32) 时触发
             _Worker.RunWorkerCompleted += _Worker_RunWorkerCompleted;   //当后台操作已完成、被取消或引发异常时触发
+
+            //绑定按钮事件
+            Start_button.Click += Start_Button_Click;
+            Cancel_button.Click += Cancel_Button_Click;
         }
         /// <summary>
         /// 当后台操作已完成、被取消或引发异常时发生
@@ -213,8 +218,8 @@ namespace AsyncTest
         /// <param name="e"></param>
         private void _Worker_RunWorkerCompleted(object sender, RunWorkerCompletedEventArgs e)
         {
-            MessageBox.Show(e.Cancelled ? $@"进程已被取消：{progressBar.Value}%" : $@"进程执行完成：{progressBar.Value}%");
-            progressBar.Value = 0;
+            MessageBox.Show(e.Cancelled ? $@"进程已被取消：{Status_progressBar.Value}%" : $@"进程执行完成：{Status_progressBar.Value}%");
+            StatusRecover();
         }
 
         /// <summary>
@@ -224,7 +229,7 @@ namespace AsyncTest
         /// <param name="e"></param>
         private void _Worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
         {
-            progressBar.Value = e.ProgressPercentage;   //异步任务的进度百分比
+            Status_progressBar.Value = e.ProgressPercentage;   //异步任务的进度百分比
         }
 
         /// <summary>
@@ -251,6 +256,31 @@ namespace AsyncTest
                 Thread.Sleep(250);  //线程挂起 250 毫秒
             }
         }
+        /// <summary>
+        /// 启动按钮事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Start_Button_Click(object sender, EventArgs e)
+        {
+            Start_button.Enabled = false;
+            if (!_Worker.IsBusy)
+            {
+                _Worker.RunWorkerAsync();
+            }
+        }
+        /// <summary>
+        /// 终止按钮事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Cancel_Button_Click(object sender, EventArgs e)
+        {
+            if (Start_button.Enabled) return;//未在运行中
+            _Worker.CancelAsync();
+
+        }
+
 
     }
 }

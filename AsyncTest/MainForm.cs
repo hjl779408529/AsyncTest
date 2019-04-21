@@ -31,7 +31,10 @@ namespace AsyncTest
             //Fun2();
 
             //方法3
-            Fun3();
+            //Fun3();
+
+            //方法4
+            Fun4();
         }
     }
 }
